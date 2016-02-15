@@ -1,2 +1,3 @@
-# miBadger.Router
-The Router Component
+# Router
+
+The Router Component.

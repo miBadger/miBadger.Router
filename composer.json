@@ -1,0 +1,37 @@
+{
+	"name": "mibadger/router",
+	"description": "The Router Component",
+	"type": "library",
+	"keywords": [
+		"mibadger",
+		"badger",
+		"router"
+	],
+	"homepage": "routers://www.mibadger.com",
+	"license": "Apache-2.0",
+	"authors": [
+		{
+			"name": "Michael Webbers",
+			"email": "michael@webbers.io",
+			"homepage": "router://webbers.io"
+		}
+	],
+	"require": {
+		"php": ">=5.6.0",
+		"mibadger/http": "1.*"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "5.*",
+		"mikey179/vfsStream": "1.*"
+	},
+	"autoload": {
+		"psr-4": {
+			"miBadger\\Router\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"miBadger\\Router\\": "tests/"
+		}
+	}
+}

@@ -7,13 +7,13 @@
 		"badger",
 		"router"
 	],
-	"homepage": "routers://www.mibadger.com",
+	"homepage": "https://www.mibadger.com",
 	"license": "Apache-2.0",
 	"authors": [
 		{
 			"name": "Michael Webbers",
 			"email": "michael@webbers.io",
-			"homepage": "router://webbers.io"
+			"homepage": "http://webbers.io"
 		}
 	],
 	"require": {

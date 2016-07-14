@@ -1,31 +1,76 @@
 # Router
 
-The router class is used to simplify routing.
+The router class.
 
 ## Example(s)
 
 ```php
-// Create a new router.
-$router = new Router();
+<?php
 
-// Create a method route.
-$router->set('GET', '/method/', 'method');
+use miBadger\Router\Router;
 
-// Create a class method route.
-$router->set('GET', '/class/', ['Class', 'method']);
+/**
+ * Construct a Router object with the given routers.
+ */
+$router = new Router($basePath = '', $routes = [], $parameters = []);
 
-// Create a closure route.
-$router->set('GET', '/closure/', function() { return 'result'; });
+/**
+ * Returns the base path.
+ */
+$router->getBasePath();
 
-// Create a wildcard route.
-$router->set('GET', '/*/', function() { return 'result'; });
+/**
+ * Set the base path.
+ */
+$router->setBasePath($basePath);
 
-// Resolve route
-try {
-	echo $router->resolve();
-} catch (ServerResponseException $e) {
-	$e->getServerResponse()->send();
-} catch (Exception $e) {
-	echo 'Internal server error';
-}
+/**
+ * {@inheritdoc}
+ */
+$router->getIterator();
+
+/**
+ * Returns the number of key-value mappings in the router map.
+ */
+$router->count();
+
+/**
+ * Returns true if the router map contains no key-value mappings.
+ */
+$router->isEmpty();
+
+/**
+ * Returns true if the router map contains a mapping for the specified method & route.
+ */
+$router->contains($method, $route);
+
+/**
+ * Returns true if the router map maps one or more routes to the specified callable.
+ */
+$router->containsCallable(callable $callable);
+
+/**
+ * Returns the callable to which the specified route is mapped, or null if the router map contains no mapping for the route.
+ */
+$router->get($method, $route);
+
+/**
+ * Associates the specified callable with the specified method & route in the route map.
+ */
+$router->set($method, $route, callable $callable, array $parameters = []);
+
+/**
+ * Removes the mapping for the specified route from the router map if present.
+ */
+$router->remove($method, $route);
+
+/**
+ * Removes all of the mappings from the router map.
+ */
+$router->clear();
+
+/**
+ * Returns the result of the given route's callable.
+ */
+$router->resolve($method = null, $route = null);
 ```

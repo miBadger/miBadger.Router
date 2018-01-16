@@ -36,6 +36,20 @@ $router->set('GET', '/closure/', function() {
 });
 
 /**
+ * Create a wildcard route.
+ */
+$router->set('GET', '/test/{wildcard}/', function($wildcard) {
+	return $wildcard;
+});
+
+/**
+ * Add multiple methods for a route.
+ */
+$router->set(['GET', 'POST', 'TEST'], '/route/', function() {
+	return 'result';
+});
+
+/**
  * Resolve
  */
 $router->resolve();

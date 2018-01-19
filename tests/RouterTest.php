@@ -10,12 +10,14 @@
 
 namespace miBadger\Router;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * The router test class.
  *
  * @since 1.0.0
  */
-class RouterTest extends \PHPUnit_Framework_TestCase
+class RouterTest extends TestCase
 {
 	/** @var callable The callable. */
 	private $callable;

@@ -31,7 +31,6 @@ class Router implements \IteratorAggregate
 	 * Construct a Router object with the given routers.
 	 *
 	 * @param string $basePath = ''
-	 * @param array $routes = []
 	 */
 	public function __construct($basePath = '')
 	{
@@ -105,17 +104,7 @@ class Router implements \IteratorAggregate
 	 */
 	public function contains($method, $route)
 	{
-		if (!array_key_exists($method, $this->routes)) {
-			return false;
-		}
-
-		foreach ($this->routes[$method] as $entry) {
-			if ($entry->route == $route) {
-				return true;
-			}
-		}
-
-		return false;
+		return $this->get($method, $route) !== null;
 	}
 
 	/**
@@ -184,7 +173,7 @@ class Router implements \IteratorAggregate
 	/**
 	 * Adds a method & route to the to the route map.
 	 *
-	 * @param string $methods
+	 * @param string $method
 	 * @param string $route
 	 * @param callable $callable
 	 */
@@ -211,7 +200,7 @@ class Router implements \IteratorAggregate
 	 */
 	private function createPattern(string $route)
 	{
-		return '|^' . preg_replace("|\{[^\}]+\}|", "([^\/]+)", $route) . '$|';
+		return '|^' . preg_replace('|\{[^\}]+\}|', '([^\/]+)', $route) . '$|';
 	}
 
 	/**

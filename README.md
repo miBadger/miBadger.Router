@@ -3,6 +3,7 @@
 [![Build Status](https://scrutinizer-ci.com/g/miBadger/miBadger.Router/badges/build.png?b=master)](https://scrutinizer-ci.com/g/miBadger/miBadger.Router/build-status/master)
 [![Code Coverage](https://scrutinizer-ci.com/g/miBadger/miBadger.Router/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/miBadger/miBadger.Router/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/miBadger/miBadger.Router/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/miBadger/miBadger.Router/?branch=master)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/68ea797b-bc99-42df-8c97-1fa99b90fc72/mini.png)](https://insight.sensiolabs.com/projects/68ea797b-bc99-42df-8c97-1fa99b90fc72)
 
 The Router Component.
 

@@ -27,21 +27,15 @@ class Router implements \IteratorAggregate
 	/** @var array The routes. */
 	private $routes;
 
-	/** @var array The parameters. */
-	private $parameters;
-
 	/**
 	 * Construct a Router object with the given routers.
 	 *
 	 * @param string $basePath = ''
-	 * @param array $routes = []
-	 * @param array $parameters = []
 	 */
-	public function __construct($basePath = '', $routes = [], $parameters = [])
+	public function __construct($basePath = '')
 	{
 		$this->basePath = $basePath;
-		$this->routes = $routes;
-		$this->parameters = $parameters;
+		$this->routes = [];
 	}
 
 	/**
@@ -110,7 +104,7 @@ class Router implements \IteratorAggregate
 	 */
 	public function contains($method, $route)
 	{
-		return isset($this->routes[$method][$route]);
+		return $this->get($method, $route) !== null;
 	}
 
 	/**
@@ -121,9 +115,10 @@ class Router implements \IteratorAggregate
 	 */
 	public function containsCallable(callable $callable)
 	{
-		foreach ($this->routes as $route) {
-			foreach ($route as $result) {
-				if ($result[0] === $callable) {
+		foreach ($this->routes as $method) {
+			foreach ($method as $entry)
+			{
+				if ($entry->callable === $callable) {
 					return true;
 				}
 			}
@@ -137,27 +132,75 @@ class Router implements \IteratorAggregate
 	 *
 	 * @param string $method
 	 * @param string $route
-	 * @return array the callable to which the specified route is mapped, or null if the router map contains no mapping for the route.
+	 * @return callable the callable to which the specified route is mapped, or null if the router map contains no mapping for the route.
 	 */
 	public function get($method, $route)
 	{
-		return $this->contains($method, $route) ? $this->routes[$method][$route] : null;
+		if (!array_key_exists($method, $this->routes)) {
+			return null;
+		}
+
+		foreach ($this->routes[$method] as $key => $entry) {
+			if ($entry->route == $route) {
+				return $entry->callable;
+			}
+		}
+
+		return null;
 	}
 
 	/**
 	 * Associates the specified callable with the specified method & route in the route map.
 	 *
+	 * @param string|array $methods
+	 * @param string $route
+	 * @param callable $callable
+	 * @return $this
+	 */
+	public function set($methods, $route, callable $callable)
+	{
+		if (is_string($methods)) {
+			$methods = [$methods];
+		}
+
+		foreach ($methods as $method) {
+			$this->add($method, $route, $callable);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Adds a method & route to the to the route map.
+	 *
 	 * @param string $method
 	 * @param string $route
 	 * @param callable $callable
-	 * @param array $parameters = []
-	 * @return $this
 	 */
-	public function set($method, $route, callable $callable, array $parameters = [])
+	private function add(string $method, string $route, callable $callable)
 	{
-		$this->routes[$method][$route] = [$callable, $parameters + $this->parameters];
+		$entry = (object)[
+			'route' => $route,
+			'pattern' => $this->createPattern($route),
+			'callable' => $callable
+		];
 
-		return $this;
+		if (!array_key_exists($method, $this->routes)) {
+			$this->routes[$method] = [];
+		}
+
+		$this->routes[$method][] = $entry;
+	}
+
+	/**
+	 * Creates a regex-enabled pattern from the route
+	 *
+	 * @param string $route
+	 * @return string the pattern string.
+	 */
+	private function createPattern(string $route)
+	{
+		return '|^' . preg_replace('|\{[^\}]+\}|', '([^\/]+)', $route) . '$|';
 	}
 
 	/**
@@ -169,7 +212,19 @@ class Router implements \IteratorAggregate
 	 */
 	public function remove($method, $route)
 	{
-		unset($this->routes[$method][$route]);
+		if (!array_key_exists($method, $this->routes)) {
+			return;
+		}
+
+		foreach ($this->routes[$method] as $key => $entry) {
+			if ($entry->route == $route) {
+				unset($this->routes[$method][$key]);
+			}
+		}
+
+		if (count($this->routes[$method]) == 0) {
+			unset($this->routes[$method]);
+		}
 	}
 
 	/**
@@ -214,13 +269,20 @@ class Router implements \IteratorAggregate
 	 *
 	 * @param string $method
 	 * @param string $route
-	 * @return array the callable to which the specied method and route are mapped.
+	 * @return array the callable to which the specied method and route are mapped and the route matches.
 	 * @throws ServerResponseException
 	 */
 	private function getCallable($method, $route)
 	{
-		if ($this->contains($method, $route)) {
-			return $this->get($method, $route);
+		if (!array_key_exists($method, $this->routes)) {
+			throw new ServerResponseException(new ServerResponse(404));
+		}
+
+		foreach ($this->routes[$method] as $entry) {
+			if (preg_match($entry->pattern, $route, $matches) > 0) {
+				array_shift($matches);
+				return [$entry->callable, $matches];
+			}
 		}
 
 		throw new ServerResponseException(new ServerResponse(404));
@@ -229,7 +291,7 @@ class Router implements \IteratorAggregate
 	/**
 	 * Returns the result of the callable.
 	 *
-	 * @param array $callable
+	 * @param array the callable and the route matches.
 	 * @return mixed the result the callable.
 	 */
 	private function callCallable($callable)

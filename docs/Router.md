@@ -12,7 +12,7 @@ use miBadger\Router\Router;
 /**
  * Construct a Router object with the given routers.
  */
-$router = new Router($basePath = '', $routes = [], $parameters = []);
+$router = new Router($basePath = '');
 
 /**
  * Returns the base path.
@@ -57,7 +57,12 @@ $router->get($method, $route);
 /**
  * Associates the specified callable with the specified method & route in the route map.
  */
-$router->set($method, $route, callable $callable, array $parameters = []);
+$router->set($method, $route, callable $callable);
+
+/**
+ * Associates the specified callable with the specified methods & route in the route map.
+ */
+$router->set(array $methods, $route, callable $callable);
 
 /**
  * Removes the mapping for the specified route from the router map if present.

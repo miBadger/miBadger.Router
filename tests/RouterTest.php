@@ -49,7 +49,7 @@ class RouterTest extends TestCase
 	public function testGetIterator()
 	{
 		$entry = (object)['route' => '/path/', 'pattern' => '|^/path/$|', 'callable' => $this->callable];
-		$this->assertEquals(new \RecursiveArrayIterator(['GET' => [$entry]]), $this->router->getIterator());
+		$this->assertEquals(new \RecursiveArrayIterator(['GET' => ['|^/path/$|' => $entry]]), $this->router->getIterator());
 	}
 
 	public function testCount()
@@ -149,6 +149,19 @@ class RouterTest extends TestCase
 		$this->router->set(['GET'], '{name}', function($name){ return $name; });
 		$this->assertEquals('foo', $this->router->resolve('GET', 'foo'));
 		$this->assertEquals('bar-baz', $this->router->resolve('GET', 'bar-baz'));
+	}
+
+	public function testOverwriteRoute()
+	{
+		$this->router->set(['GET'], '/test/', function(){ return 'test'; });
+		$this->assertEquals($this->router->get('GET', '/test/')(), 'test');
+
+		$this->router->set(['GET'], '/test/', function(){ return 'overwrite'; });
+		$this->assertEquals($this->router->get('GET', '/test/')(), 'overwrite');
+
+		$this->router->set(['GET'], '/{test}/', function(){ return 'test'; });
+		$this->router->set(['GET'], '/{test2}/', function(){ return 'overwrite'; });
+		$this->assertEquals($this->router->get('GET', '/{test1}/')(), 'overwrite');
 	}
 
 	/**

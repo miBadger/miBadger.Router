@@ -139,10 +139,10 @@ class Router implements \IteratorAggregate
 			return null;
 		}
 
-		foreach ($this->routes[$method] as $key => $entry) {
-			if ($entry->route == $route) {
-				return $entry->callable;
-			}
+		$pattern = $this->createPattern($route);
+
+		if (array_key_exists($pattern, $this->routes[$method])) {
+			return $this->routes[$method][$pattern]->callable;
 		}
 
 		return null;
@@ -178,9 +178,11 @@ class Router implements \IteratorAggregate
 	 */
 	private function add(string $method, string $route, callable $callable)
 	{
+		$pattern = $this->createPattern($route);
+
 		$entry = (object)[
 			'route' => $route,
-			'pattern' => $this->createPattern($route),
+			'pattern' => $pattern,
 			'callable' => $callable
 		];
 
@@ -188,7 +190,7 @@ class Router implements \IteratorAggregate
 			$this->routes[$method] = [];
 		}
 
-		$this->routes[$method][] = $entry;
+		$this->routes[$method][$pattern] = $entry;
 	}
 
 	/**
@@ -215,10 +217,10 @@ class Router implements \IteratorAggregate
 			return;
 		}
 
-		foreach ($this->routes[$method] as $key => $entry) {
-			if ($entry->route == $route) {
-				unset($this->routes[$method][$key]);
-			}
+		$pattern = $this->createPattern($route);
+
+		if (array_key_exists($pattern, $this->routes[$method])) {
+			unset($this->routes[$method][$pattern]);
 		}
 
 		if (count($this->routes[$method]) == 0) {

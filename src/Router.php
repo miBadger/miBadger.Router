@@ -259,7 +259,7 @@ class Router implements \IteratorAggregate
 		}
 
 		if ($this->basePath !== '' && strpos($route, $this->basePath, 0) === 0) {
-			$route = substr($route, strlen($this->basePath));
+			$route = mb_substr($route, strlen($this->basePath));
 		}
 
 		return $this->callCallable($this->getCallable($method, $route));

@@ -12,7 +12,7 @@ The Router Component.
 ```php
 <?php
 
-use miBadger/Router/Router;
+use miBadger\Router\Router;
 
 /**
  * Create a new router.
@@ -53,5 +53,37 @@ $router->set(['GET', 'POST', 'TEST'], '/route/', function() {
 /**
  * Resolve
  */
+$router->resolve();
+```
+
+## Access Router Example
+The access router behaves very similarly to the normal router, except that it expects an object in the constructor implementing the "PermissionCheckable" interface (that for example represents the logged-in user), or null (in case of an anauthenticated entity).
+The ```$router->add``` method now requires an extra parameter that specifies the permission required to access this route. The PermissionCheckable interface will then determine whether this conditions is met during the resolving of the route.
+
+```php
+class Permission
+{
+	const READ_ACCESS = "READ_ACCESS";
+	const WRITE_ACCESS = "WRITE_ACCESS";
+	const DELETE_ACCESS = "DELETE_ACCESS";
+}
+
+class User implements PermissionCheckable
+{
+	public function hasPermission($permission)
+	{
+		$permissions = [Permission::READ_ACCESS, Permission::WRITE_ACCESS];
+		return in_array($permission, $permissions);
+	}
+}
+
+$router = new AccessRouter(new User(), '');
+
+
+$router->add('GET', '/read/', Permission::READ_ACCESS, function() {
+	return 'result';
+});
+
+
 $router->resolve();
 ```

@@ -208,7 +208,7 @@ class AccessRouter
 
 		}
 
-		throw new ServerResponseException(new ServerResponse(401));
+		throw new ServerResponseException(new ServerResponse(403));
 	}
 
 	/**

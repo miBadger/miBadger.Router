@@ -57,9 +57,10 @@ $router->resolve();
 ```
 
 ## Access Router Example
-The access router behaves very similarly to the normal router, except that it expects an object in the constructor implementing the "PermissionCheckable" interface (that for example represents the logged-in user), or null (in case of an anauthenticated entity).
-The ```$router->add``` method now requires an extra parameter that specifies the permission required to access this route. The PermissionCheckable interface will then determine whether this conditions is met during the resolving of the route.
+The access router behaves very similar to the normal router, except that it expects an object in the constructor implementing the ```PermissionCheckable``` interface (which represents the authenticated user), or null (in case of an anauthenticated entity).
+The ```$router->add``` method now requires an extra parameter that specifies the permission required to access this route. The ```PermissionCheckable``` interface will then determine whether this condition is met during the resolving of the route.
 
+Example with permissions:
 ```php
 class Permission
 {
@@ -87,3 +88,37 @@ $router->add('GET', '/read/', Permission::READ_ACCESS, function() {
 
 $router->resolve();
 ```
+
+Example with user levels:
+```php
+class UserLevel
+{
+	const USER = 1;
+	const MODERATOR = 2;
+	const ADMIN = 4;
+}
+
+class User implements PermissionCheckable
+{
+	private $userLevel;
+
+	public function hasPermission($permission)
+	{
+		return $permission & $this->userLevel;
+	}
+}
+
+$router = new AccessRouter(new User(), '');
+
+
+$router->add('GET', '/admin-only/', UserLevel::ADMIN, function() {
+	return 'result';
+});
+
+$router->add('GET', '/moderator-and-admin/', UserLevel::ADMIN | UserLevel::MODERATOR, function() {
+	return 'result';
+});
+
+$router->resolve();
+```
+

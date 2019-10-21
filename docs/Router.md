@@ -10,7 +10,7 @@ The router class.
 use miBadger\Router\Router;
 
 /**
- * Construct a Router object with the given routers.
+ * Construct a Router object with the given base path.
  */
 $router = new Router($basePath = '');
 

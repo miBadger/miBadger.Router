@@ -162,7 +162,7 @@ class AccessRouter
 	 * @param array the callable and the route matches.
 	 * @return mixed the result the callable.
 	 */
-	private function callCallable($callable)
+	protected function callCallable($callable)
 	{
 		return call_user_func_array($callable[0], $callable[1]);
 	}

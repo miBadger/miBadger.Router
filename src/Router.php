@@ -176,7 +176,7 @@ class Router implements \IteratorAggregate
 	 * @param string $route
 	 * @param callable $callable
 	 */
-	private function add(string $method, string $route, callable $callable)
+	protected function add(string $method, string $route, callable $callable)
 	{
 		$pattern = $this->createPattern($route);
 
@@ -199,7 +199,7 @@ class Router implements \IteratorAggregate
 	 * @param string $route
 	 * @return string the pattern string.
 	 */
-	private function createPattern(string $route)
+	protected function createPattern(string $route)
 	{
 		return '|^' . preg_replace('|\{[^\}]+\}|', '([^\/]+)', $route) . '$|';
 	}
@@ -273,7 +273,7 @@ class Router implements \IteratorAggregate
 	 * @return array the callable to which the specied method and route are mapped and the route matches.
 	 * @throws ServerResponseException
 	 */
-	private function getCallable($method, $route)
+	protected function getCallable($method, $route)
 	{
 		if (!array_key_exists($method, $this->routes)) {
 			throw new ServerResponseException(new ServerResponse(404));
@@ -295,7 +295,7 @@ class Router implements \IteratorAggregate
 	 * @param array the callable and the route matches.
 	 * @return mixed the result the callable.
 	 */
-	private function callCallable($callable)
+	protected function callCallable($callable)
 	{
 		return call_user_func_array($callable[0], $callable[1]);
 	}

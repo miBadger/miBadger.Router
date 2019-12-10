@@ -18,10 +18,10 @@
 	],
 	"require": {
 		"php": "^7.0",
-		"mibadger/http": "^2.0"
+		"mibadger/http": "^3.0"
 	},
 	"require-dev": {
-		"phpunit/phpunit": "^6.5"
+		"phpunit/phpunit": "^8.4"
 	},
 	"autoload": {
 		"psr-4": {

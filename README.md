@@ -12,7 +12,7 @@ The Router Component.
 ```php
 <?php
 
-use miBadger/Router/Router;
+use miBadger\Router\Router;
 
 /**
  * Create a new router.
@@ -55,3 +55,70 @@ $router->set(['GET', 'POST', 'TEST'], '/route/', function() {
  */
 $router->resolve();
 ```
+
+## Access Router Example
+The access router behaves very similar to the normal router, except that it expects an object in the constructor implementing the ```PermissionCheckable``` interface (which represents the authenticated user), or null (in case of an anauthenticated entity).
+The ```$router->add``` method now requires an extra parameter that specifies the permission required to access this route. The ```PermissionCheckable``` interface will then determine whether this condition is met during the resolving of the route.
+
+Example with permissions:
+```php
+class Permission
+{
+	const READ_ACCESS = "READ_ACCESS";
+	const WRITE_ACCESS = "WRITE_ACCESS";
+	const DELETE_ACCESS = "DELETE_ACCESS";
+}
+
+class User implements PermissionCheckable
+{
+	public function hasPermission($permission)
+	{
+		$permissions = [Permission::READ_ACCESS, Permission::WRITE_ACCESS];
+		return in_array($permission, $permissions);
+	}
+}
+
+$router = new AccessRouter(new User(), '');
+
+
+$router->add('GET', '/read/', Permission::READ_ACCESS, function() {
+	return 'result';
+});
+
+
+$router->resolve();
+```
+
+Example with user levels:
+```php
+class UserLevel
+{
+	const USER = 1;
+	const MODERATOR = 2;
+	const ADMIN = 4;
+}
+
+class User implements PermissionCheckable
+{
+	private $userLevel;
+
+	public function hasPermission($permission)
+	{
+		return $permission & $this->userLevel;
+	}
+}
+
+$router = new AccessRouter(new User(), '');
+
+
+$router->add('GET', '/admin-only/', UserLevel::ADMIN, function() {
+	return 'result';
+});
+
+$router->add('GET', '/moderator-and-admin/', UserLevel::ADMIN | UserLevel::MODERATOR, function() {
+	return 'result';
+});
+
+$router->resolve();
+```
+

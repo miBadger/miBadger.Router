@@ -24,7 +24,7 @@ class RouterTest extends TestCase
 	/** @var Router The router. */
 	private $router;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->router = new Router('');
 
@@ -49,7 +49,7 @@ class RouterTest extends TestCase
 	public function testGetIterator()
 	{
 		$entry = (object)['route' => '/path/', 'pattern' => '|^/path/$|', 'callable' => $this->callable];
-		$this->assertEquals(new \RecursiveArrayIterator(['GET' => [$entry]]), $this->router->getIterator());
+		$this->assertEquals(new \RecursiveArrayIterator(['GET' => ['|^/path/$|' => $entry]]), $this->router->getIterator());
 	}
 
 	public function testCount()
@@ -151,23 +151,34 @@ class RouterTest extends TestCase
 		$this->assertEquals('bar-baz', $this->router->resolve('GET', 'bar-baz'));
 	}
 
-	/**
-	 * @expectedException miBadger\Http\ServerResponseException
-	 * @expectedExceptionMessage Not Found
-	 * @expectedExceptionCode 404
-	 */
+	public function testOverwriteRoute()
+	{
+		$this->router->set(['GET'], '/test/', function(){ return 'test'; });
+		$this->assertEquals($this->router->get('GET', '/test/')(), 'test');
+
+		$this->router->set(['GET'], '/test/', function(){ return 'overwrite'; });
+		$this->assertEquals($this->router->get('GET', '/test/')(), 'overwrite');
+
+		$this->router->set(['GET'], '/{test}/', function(){ return 'test'; });
+		$this->router->set(['GET'], '/{test2}/', function(){ return 'overwrite'; });
+		$this->assertEquals($this->router->get('GET', '/{test1}/')(), 'overwrite');
+	}
+
 	public function testResolveNotFound()
 	{
+		$this->expectException(\miBadger\Http\ServerResponseException::class);
+		$this->expectExceptionMessage("Not Found");
+		$this->expectExceptionCode(404);
+
 		$this->router->resolve();
 	}
 
-	/**
-	 * @expectedException miBadger\Http\ServerResponseException
-	 * @expectedExceptionMessage Not Found
-	 * @expectedExceptionCode 404
-	 */
 	public function testResolveWildcardNotFound()
 	{
+		$this->expectException(\miBadger\Http\ServerResponseException::class);
+		$this->expectExceptionMessage("Not Found");
+		$this->expectExceptionCode(404);
+		
 		$this->router->set(['GET'], '{name}', function($name){ return $name; });
 		$this->router->resolve('GET', '/foo/');
 	}

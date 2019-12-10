@@ -24,7 +24,7 @@ class RouterTest extends TestCase
 	/** @var Router The router. */
 	private $router;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->router = new Router('');
 
@@ -164,23 +164,21 @@ class RouterTest extends TestCase
 		$this->assertEquals($this->router->get('GET', '/{test1}/')(), 'overwrite');
 	}
 
-	/**
-	 * @expectedException miBadger\Http\ServerResponseException
-	 * @expectedExceptionMessage Not Found
-	 * @expectedExceptionCode 404
-	 */
 	public function testResolveNotFound()
 	{
+		$this->expectException(\miBadger\Http\ServerResponseException::class);
+		$this->expectExceptionMessage("Not Found");
+		$this->expectExceptionCode(404);
+
 		$this->router->resolve();
 	}
 
-	/**
-	 * @expectedException miBadger\Http\ServerResponseException
-	 * @expectedExceptionMessage Not Found
-	 * @expectedExceptionCode 404
-	 */
 	public function testResolveWildcardNotFound()
 	{
+		$this->expectException(\miBadger\Http\ServerResponseException::class);
+		$this->expectExceptionMessage("Not Found");
+		$this->expectExceptionCode(404);
+		
 		$this->router->set(['GET'], '{name}', function($name){ return $name; });
 		$this->router->resolve('GET', '/foo/');
 	}

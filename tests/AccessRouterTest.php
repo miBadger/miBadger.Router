@@ -24,7 +24,7 @@ class AccessRouterTest extends TestCase
 	/** @var Router The router. */
 	private $router;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->user = new User();
 		$this->router = new AccessRouter($this->user, '');
@@ -47,12 +47,11 @@ class AccessRouterTest extends TestCase
 		$this->assertEquals('access granted!', $this->router->resolve('GET', '/read/'));
 	}
 
-	/**
-	 * @expectedException miBadger\Http\ServerResponseException
-	 * @expectedExceptionCode 401
-	 */
 	public function testAccessDeniedOnResolve()
 	{
+		$this->expectException(\miBadger\Http\ServerResponseException::class);
+		$this->expectExceptionCode(403);
+
 		// user + incorrect permission set
 		$this->router->add('GET', '/delete/', Permission::DELETE_ACCESS, function () {
 			return 'access granted';
@@ -60,12 +59,10 @@ class AccessRouterTest extends TestCase
 		$this->router->resolve('GET', '/delete/');
 	}
 
-	/**
-	 * @expectedException miBadger\Http\ServerResponseException
-	 * @expectedExceptionCode 401
-	 */
 	public function testAccessDeniedOnNoUser()
 	{
+		$this->expectException(\miBadger\Http\ServerResponseException::class);
+		$this->expectExceptionCode(403);		
 		// null user + permission set
 		$noUserRouter = new AccessRouter(null, '');
 		$noUserRouter->add('GET', '/read/', Permission::READ_ACCESS, function() {
@@ -98,23 +95,21 @@ class AccessRouterTest extends TestCase
 		$this->assertEquals(['/path/' => null, '/foo/%s/' => [Permission::READ_ACCESS]], $this->router->makeGETRoutePermissionsMap());
 	}
 
-	/**
-	 * @expectedException miBadger\Http\ServerResponseException
-	 * @expectedExceptionMessage Not Found
-	 * @expectedExceptionCode 404
-	 */
 	public function testResolveNotFound()
 	{
+		$this->expectException(\miBadger\Http\ServerResponseException::class);
+		$this->expectExceptionMessage("Not Found");
+		$this->expectExceptionCode(404);
+
 		$this->router->resolve();
 	}
 
-	/**
-	 * @expectedException miBadger\Http\ServerResponseException
-	 * @expectedExceptionMessage Not Found
-	 * @expectedExceptionCode 404
-	 */
 	public function testResolveWildcardNotFound()
 	{
+		$this->expectException(\miBadger\Http\ServerResponseException::class);
+		$this->expectExceptionMessage("Not Found");
+		$this->expectExceptionCode(404);
+
 		$this->router->add('GET', '{name}', null, function($name){ return $name; });
 		$this->router->resolve('GET', '/foo/');
 	}	
